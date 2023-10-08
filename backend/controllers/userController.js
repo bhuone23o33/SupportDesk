@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel.js');
+const jwt = require('jsonwebtoken');
 // @desc   Register a user
 // @route  /api/users
 // @access  public 
@@ -42,15 +43,12 @@ const registerUser = asyncHandler(async(req,res)=>{
             _id:user._id,
             name:user.name,
             email:user.email,
+            token:generateToken(user._id),
         })
     }else{
         res.status(400);
         throw new Error('Invalid User data');
     }
-
-
-
-    res.send('Register Route');
 })
 
 // @desc   login a user
@@ -58,12 +56,48 @@ const registerUser = asyncHandler(async(req,res)=>{
 // @access  public 
 
 const loginUser = asyncHandler(async(req,res)=>{
-    res.send('Login Route');
+    const {email,password} = req.body;
+
+    // checking if exist
+    const user = await User.findOne({email});
+
+    if(user && (await bcrypt.compare(password,user.password))){
+        res.status(201).json({
+            _id:user._id,
+            name:user.name,
+            email:user.email,
+            token:generateToken(user._id),
+        })
+    }else{
+        res.status(401);
+        throw new Error('Invalid Email or Password');
+    }
 })
+
+// @desc   get current user
+// @route  /api/users/me  
+// @access  private
+
+const getMe = asyncHandler(async(req,res)=>{
+    const user = {
+        id:req.user._id,
+        name: req.user.name,
+        email:req.user.email,
+    }
+    res.status(200).json(user);
+})
+
+// generate Token
+const generateToken = (id)=>{
+    return jwt.sign({ id },process.env.JWT_SECERET,{
+        expiresIn:'30d',
+    }); 
+}  
 
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    getMe
 }
 
 

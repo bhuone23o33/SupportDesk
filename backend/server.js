@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv').config();
 const colors = require('colors');
 const connectDB = require('./config/db.js');
-const {errorHandler} = require('./middleware/errorMiddleware.js');
+const {errorHandler} = require('./middleware/errorMiddleware.js'); 
 
 // connnect to DB
 connectDB();
