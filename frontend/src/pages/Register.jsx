@@ -1,6 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { FaUser } from 'react-icons/fa'
+import { useSelector, useDispatch } from 'react-redux'
+import { register, reset } from '../features/auth/authSlice.js'
+
+
 function Register() {
     // to store data
     const [formData, setFormData] = useState({
@@ -10,8 +15,32 @@ function Register() {
         password2: ''
     })
 
+    const navigate = useNavigate();
+
+
     // destructing the formData for easy acces
     const { name, email, password, password2 } = formData;
+
+    // use dispatch
+    const dispatch = useDispatch();
+
+    // use Selector
+    const { user, isLoading, isError, isSuccess, message } = useSelector(state => state.auth);
+
+    useEffect(() => {
+        if (isError) {
+            toast.error(message);
+        }
+
+        // redirect to logged in
+        if (isSuccess && user) {
+            navigate('/');
+        }
+
+        dispatch(reset());
+
+    }, [isError, isSuccess, navigate, user, message, dispatch]);
+
 
     // onChange function in inputs
     const onChange = (e) => {
@@ -24,10 +53,16 @@ function Register() {
     // onSubmit the form
     const onSubmit = (e) => {
         e.preventDefault();
-        console.log(password[0], password2[0]);
         // if pass don't match
         if (password !== password2) {
             toast.error("Password do not match");
+        } else {
+            const UserData = {
+                name,
+                email,
+                password
+            }
+            dispatch(register(UserData));
         }
     }
     return (
