@@ -9,7 +9,6 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000', // Replace with your API server URL
         changeOrigin: true,
-
       },
     },
   },
