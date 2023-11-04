@@ -1,21 +1,52 @@
-import { useState } from "react"
-import { useSelector } from "react-redux"
+import { useState, useEffect } from "react"
+import { useSelector, useDispatch } from "react-redux"
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
+import { createTicket, reset } from '../features/tickets/ticketSlice.js'
+import Spinner from '../components/Spinner.jsx'
+import { BackButton } from "../components/BackButton.jsx"
+
 
 function NewTickets() {
     const { user } = useSelector(state => state.auth);
+
+    const { isError, isSuccess, message, tickets, ticket, isLoading } = useSelector((state) => state.tickets);
+
+
     const [name] = useState(user.name);
     const [email] = useState(user.email);
     const [product, setProduct] = useState('iPhone');
     const [description, setDescription] = useState(' ');
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isError) {
+            toast.error(message);
+        }
+
+        if (isSuccess) {
+            dispatch(reset());
+            navigate('/tickets');
+        }
+        dispatch(reset());
+    }, [dispatch, isSuccess, message, navigate])
+
     // onsubmit the form
 
     const onSubmit = (e) => {
         e.preventDefault();
+        dispatch(createTicket({ product, description }));
+    }
+
+    if (isLoading) {
+        return <Spinner />
     }
 
     return (
         <>
+            <BackButton url='/' />
             <section className="heading">
                 <h1>Create new Ticket</h1>
                 <p>Please fill out form below</p>
@@ -67,9 +98,9 @@ function NewTickets() {
                         </textarea>
                     </div>
                     <div className="form-group">
-                        <div className="btn btn-block">
+                        <button className="btn btn-block">
                             Submit
-                        </div>
+                        </button>
                     </div>
                     <div className="form-group">SupportDesk</div>
                     <div className="form-group">--------------------</div>
