@@ -6,9 +6,10 @@ import 'react-toastify/dist/ReactToastify.css'
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
-import Tickets from './pages/Tickets.jsx';
 import NewTickets from './pages/NewTickets.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
+import Tickets from './pages/Tickets.jsx';
+import Ticket from './pages/Ticket.jsx'
 
 
 function App() {
@@ -27,6 +28,9 @@ function App() {
             </Route>
             <Route path="/tickets" element={<PrivateRoute />}>
               <Route path="/tickets" element={<Tickets />} />
+            </Route>
+            <Route path="/ticket/:ticketId" element={<PrivateRoute />}>
+              <Route path="/ticket/:ticketId" element={<Ticket />} />
             </Route>
 
           </Routes>
